@@ -1,0 +1,16 @@
+{
+  "name": "minskl",
+  "version": "0.0.0",
+  "description": "mizchi's minimum project",
+  "scripts": {
+    "server": "wzrd index.coffee:bundle.js -- -t coffeeify --extension='.coffee'",
+    "build": "browserify -t coffeeify --extension='.coffee' -o bundle.js index.coffee",
+    "open": "open -a /Applications/Google\\ Chrome\\ Canary.app 'http://localhost:9966'",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "coffeeify": "^1.0.0"
+  }
+}
