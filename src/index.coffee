@@ -1,9 +1,13 @@
 Store = require 'idb-wrapper-promisify'
-tv4 = require 'tv4'
 uuid = require 'node-uuid'
 clone = require 'clone'
 
-class Repository
+module.exports = SS = StoneSkin = {}
+
+SS.validate = (data, schema) ->
+  validate: (data) -> tv4.validate data, schema, true
+
+class SS.Base
   name: null
   schema: {}
   constructor: ->
@@ -22,9 +26,11 @@ class Repository
       cloned._id = uuid()
       cloned
 
-  validate: (data) -> tv4.validate data, @schema
+  validate: (data) -> SS.validate?(data, @schema) ? do ->
+    console.warn 'No validater. Please set StoneSkin.validate or require stone-skin/with-tv4'
+    true
 
-class SyncedMemoryRepository extends Repository
+class SS.SyncedMemoryDb extends SS.Base
   constructor: ->
     super
     @_data = []
@@ -67,7 +73,7 @@ class SyncedMemoryRepository extends Repository
   clear: -> @_data.length = 0
   all: -> clone(@_data)
 
-class MemoryRepository extends SyncedMemoryRepository
+class SS.MemoryDb extends SS.SyncedMemoryDb
   constructor: ->
     super
     @ready = Promise.resolve()
@@ -80,7 +86,7 @@ class MemoryRepository extends SyncedMemoryRepository
   clear: -> Promise.resolve super
   all: -> Promise.resolve super
 
-class IndexedDbRepository extends Repository
+class SS.IndexedDb extends SS.Base
   keyPath: '_id'
   constructor: ->
     super
@@ -130,64 +136,17 @@ class IndexedDbRepository extends Repository
   toMemoryDb: ->
     @_store.getAll()
     .then (items) =>
-      memoryDb = new class extends MemoryRepository
+      memoryDb = new class extends SS.MemoryDb
         name: @name
         schema: @schema
       memoryDb._data = items
       memoryDb
+
   toSyncedMemoryDb: ->
     @_store.getAll()
     .then (items) =>
-      memoryDb = new class extends SyncedMemoryRepository
+      memoryDb = new class extends SyncedMemoryDb
         name: @name
         schema: @schema
       memoryDb._data = items
       memoryDb
-
-window.addEventListener 'DOMContentLoaded', ->
-  document.body.innerHTML = 'Hello'
-
-  class ItemRepository extends IndexedDbRepository
-  # class ItemRepository extends MemoryRepository
-    storeName: 'Item'
-    schema:
-      # $ref: 'Item'
-      propeties:
-        # _id:
-        #   type: 'string'
-        title:
-          type: 'string'
-        body:
-          type: 'string'
-
-  item = new ItemRepository
-  item.ready
-  .then ->
-    item.clear()
-  .then ->
-    item.all()
-  .then (items) ->
-    console.log items
-  .then ->
-    item.save {
-      _id: 'xxx'
-      title: 'test2'
-      body: 'hello'
-    }
-  .then ->
-    item.save [
-      {
-        _id: 'yyy'
-        title: 'test1'
-        body: 'hello'
-      }
-    ]
-  .then ->
-    item.all()
-  .then (items) ->
-    console.log items
-    item.remove 'xxx'
-  .then ->
-    item.all()
-  .then (items) ->
-    console.log items
