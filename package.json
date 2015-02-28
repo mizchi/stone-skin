@@ -14,7 +14,9 @@
     "coffeeify": "^1.0.0"
   },
   "dependencies": {
+    "clone": "^1.0.0",
     "idb-wrapper-promisify": "^2.1.1",
+    "node-uuid": "^1.4.2",
     "tv4": "^1.1.9"
   }
 }
