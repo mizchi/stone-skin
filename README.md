@@ -6,7 +6,7 @@ Inspired by [mWater/minimongo](https://github.com/mWater/minimongo "mWater/minim
 
 Based on [mizchi/idb-wrapper-promisify](https://github.com/mizchi/idb-wrapper-promisify "mizchi/idb-wrapper-promisify")
 
-## Feature
+## Features
 
 - Promise
 - indexedDb or in memory db
@@ -62,6 +62,7 @@ item.ready
 ## TODO
 
 - Test
+- DogFooding
 
 ## LICENSE
 
