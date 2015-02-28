@@ -2,11 +2,11 @@ global.StoneSkin = require '../src/with-tv4'
 
 window.addEventListener 'DOMContentLoaded', ->
   document.body.innerHTML = 'Hello'
-
+  
   class Item extends StoneSkin.IndexedDb
     storeName: 'Item'
     schema:
-      propeties:
+      properties:
         title:
           type: 'string'
         body:

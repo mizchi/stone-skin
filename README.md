@@ -20,7 +20,7 @@ StoneSkin = require('stone-skin/with-tv4')
 class Item extends StoneSkin.IndexedDb
   storeName: 'Item'
   schema:
-    propeties:
+    properties:
       title:
         type: 'string'
       body:
