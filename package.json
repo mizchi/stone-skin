@@ -4,14 +4,16 @@
   "description": "Isomorphic IndexedDb and Memory data wrapper",
   "main": "index",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "browserify -t coffeeify --extension='.coffee' test/test.coffee -o test/test.js;open test/test.html",
     "prepublish": "$(npm bin)/coffee -o . -c src/*.coffee"
   },
   "author": "mizchi",
   "license": "MIT",
   "devDependencies": {
+    "chai": "^2.1.0",
     "coffee-script": "^1.9.1",
-    "coffeeify": "^1.0.0"
+    "coffeeify": "^1.0.0",
+    "mocha": "^2.1.0"
   },
   "dependencies": {
     "clone": "^1.0.0",

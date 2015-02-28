@@ -65,7 +65,6 @@ item.ready
 
 ## TODO
 
-- Test
 - DogFooding
 
 ## LICENSE
