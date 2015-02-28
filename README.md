@@ -2,6 +2,10 @@
 
 Isomorphic IndexedDb and in memory db wrapper.
 
+```
+$ npm install stone-skin
+```
+
 Inspired by [mWater/minimongo](https://github.com/mWater/minimongo "mWater/minimongo").
 
 Based on [mizchi/idb-wrapper-promisify](https://github.com/mizchi/idb-wrapper-promisify "mizchi/idb-wrapper-promisify")
