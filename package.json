@@ -12,5 +12,9 @@
   "license": "MIT",
   "devDependencies": {
     "coffeeify": "^1.0.0"
+  },
+  "dependencies": {
+    "idb-wrapper-promisify": "^2.1.1",
+    "tv4": "^1.1.9"
   }
 }
