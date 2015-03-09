@@ -1,7 +1,7 @@
 global.StoneSkin = require '../src/with-tv4'
 
 describe 'StoneSkin', ->
-  execScenario = (Cls) ->
+  crudScenario = (Cls) ->
     class Item extends Cls
       storeName: 'Item'
       schema:
@@ -45,13 +45,13 @@ describe 'StoneSkin', ->
       assert items.length is 1
 
   it 'should do crud by MemoryDb', ->
-    execScenario(StoneSkin.MemoryDb)
+    crudScenario(StoneSkin.MemoryDb)
 
   it 'should do crud by IndexedDb', ->
-    execScenario(StoneSkin.IndexedDb)
+    crudScenario(StoneSkin.IndexedDb)
 
-  it 'should update by same id', ->
-    item = new StoneSkin.IndexedDb
+  updateScenario = (Db) ->
+    item = new Db
     item.ready
     .then -> item.clear()
     .then ->
@@ -68,4 +68,27 @@ describe 'StoneSkin', ->
       }
     .then -> item.all()
     .then (items) ->
+      assert.ok items.length is 1
       assert.ok items[0].body is 'updated'
+    .then ->
+      item.save [
+        {
+          _id: 'xxx'
+          title: 'test'
+          body: 'zzz'
+        }
+        {
+          _id: 'yyy'
+          title: 'test'
+          body: 'zzz'
+        }
+      ]
+    .then -> item.all()
+    .then (items) ->
+      assert.ok items.length is 2
+
+  it 'should update by same id (MemoryDb)', ->
+    updateScenario(StoneSkin.MemoryDb)
+
+  it 'should update by same id (IndexedDb)', ->
+    updateScenario(StoneSkin.IndexedDb)

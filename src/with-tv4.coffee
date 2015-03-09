@@ -1,6 +1,6 @@
-SS = require './index'
+StoneSkin = require './index'
 tv4 = require 'tv4'
-SS.validate = (data, schema) ->
+StoneSkin.validate = (data, schema) ->
   validate: (data) -> tv4.validate data, schema, true
 
-module.exports = SS
+module.exports = StoneSkin

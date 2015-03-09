@@ -79,8 +79,27 @@
       this._data = [];
     }
 
+    SyncedMemoryDb.prototype._pushOrUpdate = function(data) {
+      var ensured, found, k, v;
+      found = this._find(data._id);
+      if (!!found) {
+        for (k in data) {
+          v = data[k];
+          found[k] = v;
+        }
+        return found;
+      } else {
+        ensured = this._ensureId(data);
+        this._data.push(ensured);
+        return ensured;
+      }
+    };
+
     SyncedMemoryDb.prototype.save = function(data) {
-      var objs, ref, valid;
+      var existIds, i, result, valid;
+      existIds = this._data.map(function(d) {
+        return d._id;
+      });
       if (data instanceof Array) {
         if (this.schema && !!this.skipValidate === false) {
           valid = data.every((function(_this) {
@@ -92,20 +111,22 @@
             return new Error('validation error');
           }
         }
-        objs = data.map((function(_this) {
-          return function(i) {
-            return _this._ensureId(i);
-          };
-        })(this));
-        (ref = this._data).push.apply(ref, objs);
-        return objs;
+        result = (function() {
+          var j, len, results;
+          results = [];
+          for (j = 0, len = data.length; j < len; j++) {
+            i = data[j];
+            results.push(this._pushOrUpdate(i));
+          }
+          return results;
+        }).call(this);
+        return result;
       } else {
-        this._data.push(this._ensureId(data));
-        return data;
+        return this._pushOrUpdate(data);
       }
     };
 
-    SyncedMemoryDb.prototype.find = function(id) {
+    SyncedMemoryDb.prototype._find = function(id) {
       var item, j, len, ref;
       ref = this._data;
       for (j = 0, len = ref.length; j < len; j++) {
@@ -115,6 +136,10 @@
         }
       }
       return void 0;
+    };
+
+    SyncedMemoryDb.prototype.find = function(id) {
+      return this._find(id);
     };
 
     SyncedMemoryDb.prototype.remove = function(id) {

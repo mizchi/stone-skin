@@ -2,12 +2,12 @@ Store = require 'idb-wrapper-promisify'
 uuid = require 'node-uuid'
 clone = require 'clone'
 
-module.exports = SS = StoneSkin = {}
+module.exports = StoneSkin = {}
 
-SS.validate = (data, schema) ->
+StoneSkin.validate = (data, schema) ->
   validate: (data) -> tv4.validate data, schema, true
 
-class SS.Base
+class StoneSkin.Base
   name: null
   schema: {}
   constructor: ->
@@ -26,32 +26,48 @@ class SS.Base
       cloned._id = uuid()
       cloned
 
-  validate: (data) -> SS.validate?(data, @schema) ? do ->
+  validate: (data) -> StoneSkin.validate?(data, @schema) ? do ->
     console.warn 'No validater. Please set StoneSkin.validate or require stone-skin/with-tv4'
     true
 
-class SS.SyncedMemoryDb extends SS.Base
+class StoneSkin.SyncedMemoryDb extends StoneSkin.Base
   constructor: ->
     super
     @_data = []
 
+  _pushOrUpdate: (data) ->
+    found = @_find data._id
+    if !!found
+      for k, v of data
+        found[k] = v
+      return found
+    else
+      ensured = @_ensureId(data)
+      @_data.push ensured
+      return ensured
+
   save: (data) ->
+    existIds = @_data.map (d) -> d._id
     if data instanceof Array
       if @schema and !!@skipValidate is false
         valid = data.every (data) => @validate(data)
         unless valid
           return new Error('validation error')
-      objs = data.map (i) => @_ensureId(i)
-      @_data.push objs...
-      return objs
+      result =
+        for i in data
+          @_pushOrUpdate(i)
+      return result
     else
-      @_data.push @_ensureId(data)
-      return data
+      return @_pushOrUpdate(data)
 
-  find: (id) ->
+  # raw find
+  _find: (id) ->
     for item in @_data
       if item._id is id then return item
     undefined
+
+  # will wrap
+  find: (id) -> @_find(id)
 
   remove: (id) ->
     if id instanceof Array
@@ -74,7 +90,7 @@ class SS.SyncedMemoryDb extends SS.Base
   clear: -> @_data.length = 0
   all: -> clone(@_data)
 
-class SS.MemoryDb extends SS.SyncedMemoryDb
+class StoneSkin.MemoryDb extends StoneSkin.SyncedMemoryDb
   constructor: ->
     super
     @ready = Promise.resolve()
@@ -87,7 +103,7 @@ class SS.MemoryDb extends SS.SyncedMemoryDb
   clear: -> Promise.resolve super
   all: -> Promise.resolve super
 
-class SS.IndexedDb extends SS.Base
+class StoneSkin.IndexedDb extends StoneSkin.Base
   keyPath: '_id'
   constructor: ->
     super
@@ -141,7 +157,7 @@ class SS.IndexedDb extends SS.Base
   toMemoryDb: ->
     @_store.getAll()
     .then (items) =>
-      memoryDb = new class extends SS.MemoryDb
+      memoryDb = new class extends StoneSkin.MemoryDb
         name: @name
         schema: @schema
       memoryDb._data = items
