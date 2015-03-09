@@ -98,10 +98,11 @@
           };
         })(this));
         (ref = this._data).push.apply(ref, objs);
+        return objs;
       } else {
         this._data.push(this._ensureId(data));
+        return data;
       }
-      return this._data;
     };
 
     SyncedMemoryDb.prototype.find = function(id) {

@@ -43,9 +43,10 @@ class SS.SyncedMemoryDb extends SS.Base
           return new Error('validation error')
       objs = data.map (i) => @_ensureId(i)
       @_data.push objs...
+      return objs
     else
       @_data.push @_ensureId(data)
-    return @_data
+      return data
 
   find: (id) ->
     for item in @_data

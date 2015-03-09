@@ -24,7 +24,8 @@ describe 'StoneSkin', ->
         title: 'test2'
         body: 'hello'
       }
-    .then ->
+    .then (saved) ->
+      assert.ok !!saved.length is false
       item.save [
         {
           _id: 'yyy'
@@ -32,16 +33,15 @@ describe 'StoneSkin', ->
           body: 'hello'
         }
       ]
-    .then ->
+    .then (saved) ->
+      assert.ok saved.length is 1
       item.all()
     .then (items) ->
       assert items.length is 2
-      console.log items
       item.remove 'xxx'
     .then ->
       item.all()
     .then (items) ->
-      console.log items
       assert items.length is 1
 
   it 'should do crud by IndexedDb', ->
