@@ -130,6 +130,7 @@ class SS.IndexedDb extends SS.Base
 
   find: (id) ->
     @_store.get(id)
+    .catch (e) -> undefined
 
   all: -> @_store.getAll()
 

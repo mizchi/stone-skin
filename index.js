@@ -285,7 +285,9 @@
     };
 
     IndexedDb.prototype.find = function(id) {
-      return this._store.get(id);
+      return this._store.get(id)["catch"](function(e) {
+        return void 0;
+      });
     };
 
     IndexedDb.prototype.all = function() {
