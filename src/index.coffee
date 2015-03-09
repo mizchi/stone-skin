@@ -112,7 +112,8 @@ class SS.IndexedDb extends SS.Base
       valid = objs.every (data) => @validate(data)
       unless valid
         return Promise.reject()
-    @_store.putBatch(objs.map (i) => @_ensureId(i))
+    result = objs.map (i) => @_ensureId(i)
+    @_store.putBatch(result).then -> result
 
   save: (data) ->
     if data instanceof Array then return @_saveBatch(data)
@@ -120,7 +121,9 @@ class SS.IndexedDb extends SS.Base
     if @schema and !!@skipValidate is false
       unless @validate(data)
         return Promise.reject()
-    @_store.put @_ensureId(data)
+    result = @_ensureId(data)
+    @_store.put(result)
+    .then -> result
 
   remove: (id) ->
     if id instanceof Array

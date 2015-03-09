@@ -246,7 +246,7 @@
     };
 
     IndexedDb.prototype._saveBatch = function(objs) {
-      var valid;
+      var result, valid;
       if (this.schema && !!this.skipValidate === false) {
         valid = objs.every((function(_this) {
           return function(data) {
@@ -257,14 +257,18 @@
           return Promise.reject();
         }
       }
-      return this._store.putBatch(objs.map((function(_this) {
+      result = objs.map((function(_this) {
         return function(i) {
           return _this._ensureId(i);
         };
-      })(this)));
+      })(this));
+      return this._store.putBatch(result).then(function() {
+        return result;
+      });
     };
 
     IndexedDb.prototype.save = function(data) {
+      var result;
       if (data instanceof Array) {
         return this._saveBatch(data);
       }
@@ -273,7 +277,10 @@
           return Promise.reject();
         }
       }
-      return this._store.put(this._ensureId(data));
+      result = this._ensureId(data);
+      return this._store.put(result).then(function() {
+        return result;
+      });
     };
 
     IndexedDb.prototype.remove = function(id) {
