@@ -44,8 +44,28 @@ describe 'StoneSkin', ->
     .then (items) ->
       assert items.length is 1
 
+  it 'should do crud by MemoryDb', ->
+    execScenario(StoneSkin.MemoryDb)
+
   it 'should do crud by IndexedDb', ->
     execScenario(StoneSkin.IndexedDb)
 
-  it 'should do crud by MemoryDb', ->
-    execScenario(StoneSkin.MemoryDb)
+  it 'should update by same id', ->
+    item = new StoneSkin.IndexedDb
+    item.ready
+    .then -> item.clear()
+    .then ->
+      item.save {
+        _id: 'xxx'
+        title: 'test'
+        body: 'init'
+      }
+    .then ->
+      item.save {
+        _id: 'xxx'
+        title: 'test'
+        body: 'updated'
+      }
+    .then -> item.all()
+    .then (items) ->
+      assert.ok items[0].body is 'updated'
