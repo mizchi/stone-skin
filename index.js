@@ -14,17 +14,12 @@
   module.exports = StoneSkin = {};
 
   StoneSkin.validate = function(data, schema) {
-    return {
-      validate: function(data) {
-        return tv4.validate(data, schema, true);
-      }
-    };
+    console.warn('StoneSkin.validate is not set');
+    return true;
   };
 
   StoneSkin.Base = (function() {
     Base.prototype.name = null;
-
-    Base.prototype.schema = {};
 
     function Base() {}
 
@@ -60,11 +55,11 @@
     };
 
     Base.prototype.validate = function(data) {
-      var ref;
-      return (ref = typeof StoneSkin.validate === "function" ? StoneSkin.validate(data, this.schema) : void 0) != null ? ref : (function() {
-        console.warn('No validater. Please set StoneSkin.validate or require stone-skin/with-tv4');
-        return true;
-      })();
+      return StoneSkin.validate(data, this.schema);
+    };
+
+    Base.prototype.createValidateReason = function(data) {
+      return StoneSkin.createValidateReason(data, this.schema);
     };
 
     return Base;
@@ -96,32 +91,36 @@
     };
 
     SyncedMemoryDb.prototype.save = function(data) {
-      var existIds, i, result, valid;
+      var d, existIds, i, j, len, reason, result, valid;
       existIds = this._data.map(function(d) {
         return d._id;
       });
       if (data instanceof Array) {
         if (this.schema && !!this.skipValidate === false) {
-          valid = data.every((function(_this) {
-            return function(data) {
-              return _this.validate(data);
-            };
-          })(this));
-          if (!valid) {
-            return new Error('validation error');
+          for (j = 0, len = data.length; j < len; j++) {
+            d = data[j];
+            reason = this.createValidateReason(d);
+            if (!reason.valid) {
+              throw reason.error;
+            }
           }
         }
         result = (function() {
-          var j, len, results;
+          var l, len1, results;
           results = [];
-          for (j = 0, len = data.length; j < len; j++) {
-            i = data[j];
+          for (l = 0, len1 = data.length; l < len1; l++) {
+            i = data[l];
             results.push(this._pushOrUpdate(i));
           }
           return results;
         }).call(this);
         return result;
       } else {
+        valid = this.validate(data);
+        if (!valid) {
+          reason = this.createValidateReason(data);
+          throw reason.error;
+        }
         return this._pushOrUpdate(data);
       }
     };
@@ -204,7 +203,13 @@
     }
 
     MemoryDb.prototype.save = function() {
-      return Promise.resolve(MemoryDb.__super__.save.apply(this, arguments));
+      var e;
+      try {
+        return Promise.resolve(MemoryDb.__super__.save.apply(this, arguments));
+      } catch (_error) {
+        e = _error;
+        return Promise.reject(e);
+      }
     };
 
     MemoryDb.prototype.remove = function() {
@@ -271,19 +276,18 @@
       });
     };
 
-    IndexedDb.prototype._saveBatch = function(objs) {
-      var result, valid;
+    IndexedDb.prototype._saveBatch = function(list) {
+      var data, j, len, reason, result;
       if (this.schema && !!this.skipValidate === false) {
-        valid = objs.every((function(_this) {
-          return function(data) {
-            return _this.validate(data);
-          };
-        })(this));
-        if (!valid) {
-          return Promise.reject();
+        for (j = 0, len = list.length; j < len; j++) {
+          data = list[j];
+          reason = this.createValidateReason(data);
+          if (!reason.valid) {
+            return Promise.reject(reason.error);
+          }
         }
       }
-      result = objs.map((function(_this) {
+      result = list.map((function(_this) {
         return function(i) {
           return _this._ensureId(i);
         };
@@ -294,13 +298,15 @@
     };
 
     IndexedDb.prototype.save = function(data) {
-      var result;
+      var isValid, reason, result;
       if (data instanceof Array) {
         return this._saveBatch(data);
       }
       if (this.schema && !!this.skipValidate === false) {
-        if (!this.validate(data)) {
-          return Promise.reject();
+        isValid = this.validate(data);
+        if (!isValid) {
+          reason = this.createValidateReason(data);
+          return Promise.reject(reason.error);
         }
       }
       result = this._ensureId(data);

@@ -4,12 +4,6 @@ describe 'StoneSkin', ->
   crudScenario = (Cls) ->
     class Item extends Cls
       storeName: 'Item'
-      schema:
-        properties:
-          title:
-            type: 'string'
-          body:
-            type: 'string'
     item = new Item
     item.ready
     .then ->
@@ -92,3 +86,31 @@ describe 'StoneSkin', ->
 
   it 'should update by same id (IndexedDb)', ->
     updateScenario(StoneSkin.IndexedDb)
+
+  validationScenario = (Db, done) ->
+    class Item extends Db
+      storeName: 'Item'
+      schema:
+        required: ['foo']
+        properties:
+          foo:
+            type: 'string'
+    item = new Item
+    willSave =
+      bar: 'string'
+    item.ready
+    .then -> item.clear()
+    .then -> item.save willSave
+    .then (saved) -> done('error')
+    .catch (e) ->
+      item.save [willSave]
+      .then -> done('error')
+      .catch (e) ->
+        console.log 'catched', e
+        done()
+
+  it 'validate by IndexedDb', (done) ->
+    validationScenario(StoneSkin.IndexedDb, done)
+
+  it 'validate by MemoryDb', (done) ->
+    validationScenario(StoneSkin.MemoryDb, done)

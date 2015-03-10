@@ -7,11 +7,11 @@
   tv4 = require('tv4');
 
   StoneSkin.validate = function(data, schema) {
-    return {
-      validate: function(data) {
-        return tv4.validate(data, schema, true);
-      }
-    };
+    return tv4.validate(data, schema != null ? schema : {}, true);
+  };
+
+  StoneSkin.createValidateReason = function(data, schema) {
+    return tv4.validateResult(data, schema != null ? schema : {}, true);
   };
 
   module.exports = StoneSkin;

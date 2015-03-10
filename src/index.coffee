@@ -4,12 +4,12 @@ clone = require 'clone'
 
 module.exports = StoneSkin = {}
 
-StoneSkin.validate = (data, schema) ->
-  validate: (data) -> tv4.validate data, schema, true
+StoneSkin.validate = (data, schema)->
+  console.warn 'StoneSkin.validate is not set'
+  true
 
 class StoneSkin.Base
   name: null
-  schema: {}
   constructor: ->
   save: -> throw new Error 'you should override'
   find: -> throw new Error 'you should override'
@@ -26,9 +26,11 @@ class StoneSkin.Base
       cloned._id = uuid()
       cloned
 
-  validate: (data) -> StoneSkin.validate?(data, @schema) ? do ->
-    console.warn 'No validater. Please set StoneSkin.validate or require stone-skin/with-tv4'
-    true
+  validate: (data) ->
+    StoneSkin.validate(data, @schema)
+
+  createValidateReason: (data) ->
+    StoneSkin.createValidateReason(data, @schema)
 
 class StoneSkin.SyncedMemoryDb extends StoneSkin.Base
   constructor: ->
@@ -49,15 +51,22 @@ class StoneSkin.SyncedMemoryDb extends StoneSkin.Base
   save: (data) ->
     existIds = @_data.map (d) -> d._id
     if data instanceof Array
+      # Validate
       if @schema and !!@skipValidate is false
-        valid = data.every (data) => @validate(data)
-        unless valid
-          return new Error('validation error')
+        for d in data
+          reason = @createValidateReason(d)
+          unless reason.valid
+            throw reason.error
+      # Save after validate
       result =
         for i in data
           @_pushOrUpdate(i)
       return result
     else
+      valid = @validate(data)
+      unless valid
+        reason = @createValidateReason(data)
+        throw reason.error
       return @_pushOrUpdate(data)
 
   # raw find
@@ -95,7 +104,12 @@ class StoneSkin.MemoryDb extends StoneSkin.SyncedMemoryDb
     super
     @ready = Promise.resolve()
 
-  save: -> Promise.resolve super
+  # will cause validation error
+  save: ->
+    try
+      Promise.resolve super
+    catch e
+      Promise.reject(e)
   remove: -> Promise.resolve super
   find: -> Promise.resolve super
   findOne: -> Promise.resolve super
@@ -124,20 +138,24 @@ class StoneSkin.IndexedDb extends StoneSkin.Base
   findOne: (fn) -> @where(fn).then (items) -> items[0]
 
   # Internal
-  _saveBatch: (objs) ->
+  _saveBatch: (list) ->
     if @schema and !!@skipValidate is false
-      valid = objs.every (data) => @validate(data)
-      unless valid
-        return Promise.reject()
-    result = objs.map (i) => @_ensureId(i)
+      for data in list
+        reason = @createValidateReason(data)
+        unless reason.valid
+          return Promise.reject(reason.error)
+    result = list.map (i) => @_ensureId(i)
     @_store.putBatch(result).then -> result
 
   save: (data) ->
     if data instanceof Array then return @_saveBatch(data)
 
     if @schema and !!@skipValidate is false
-      unless @validate(data)
-        return Promise.reject()
+      # console.log data
+      isValid = @validate(data)
+      unless isValid
+        reason = @createValidateReason(data)
+        return Promise.reject(reason.error)
     result = @_ensureId(data)
     @_store.put(result)
     .then -> result
