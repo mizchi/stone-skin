@@ -81,9 +81,9 @@ class StoneSkin.SyncedMemoryDb extends StoneSkin.Base
 
   remove: (id) ->
     if id instanceof Array
-      @_data = @_data.select (i) -> i._id not in id
+      @_data = @_data.filter (i) -> i._id not in id
     else
-      @_data = @_data.select (i) -> i._id isnt id
+      @_data = @_data.filter (i) -> i._id isnt id
     undefined
 
   first: (fn) ->
@@ -100,7 +100,7 @@ class StoneSkin.SyncedMemoryDb extends StoneSkin.Base
     result = []
     for i in @_data
       if fn(i) then result.push(i)
-    return clone @_data.select (i) -> fn(i)
+    return clone @_data.filter (i) -> fn(i)
 
   clear: -> @_data.length = 0
   all: -> clone(@_data)

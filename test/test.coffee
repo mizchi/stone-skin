@@ -114,3 +114,25 @@ describe 'StoneSkin', ->
 
   it 'validate by MemoryDb', (done) ->
     validationScenario(StoneSkin.MemoryDb, done)
+
+  selectScenario = (Db) ->
+    class Item extends Db
+      storeName: 'Item'
+    item = new Item
+    item.ready
+    .then -> item.save [
+      {a: 1}
+      {a: 2}
+      {a: 3}
+    ]
+    .then -> item.select (i) -> i.a >= 2
+    .then (items) ->
+      debugger
+
+      assert.ok items.length is 2
+
+  it 'select by IndexedDb', ->
+    selectScenario(StoneSkin.IndexedDb)
+
+  it 'select by MemoryDb', ->
+    selectScenario(StoneSkin.MemoryDb)
