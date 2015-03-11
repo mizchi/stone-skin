@@ -13,8 +13,9 @@ class StoneSkin.Base
   constructor: ->
   save: -> throw new Error 'you should override'
   find: -> throw new Error 'you should override'
-  findOne: -> throw new Error 'you should override'
-  where: -> throw new Error 'you should override'
+  first: -> throw new Error 'you should override'
+  last: -> throw new Error 'you should override'
+  select: -> throw new Error 'you should override'
   clear: -> throw new Error 'you should override'
 
   # Internal
@@ -80,21 +81,26 @@ class StoneSkin.SyncedMemoryDb extends StoneSkin.Base
 
   remove: (id) ->
     if id instanceof Array
-      @_data = @_data.filter (i) -> i._id not in id
+      @_data = @_data.select (i) -> i._id not in id
     else
-      @_data = @_data.filter (i) -> i._id isnt id
+      @_data = @_data.select (i) -> i._id isnt id
     undefined
 
-  findOne: (fn) ->
+  first: (fn) ->
     for item in @_data
       if fn(item) then return item
     undefined
 
-  where: (fn) ->
+  last: (fn) ->
+    for item in @_data.reverse()
+      if fn(item) then return item
+    undefined
+
+  select: (fn) ->
     result = []
     for i in @_data
       if fn(i) then result.push(i)
-    return clone @_data.filter (i) -> fn(i)
+    return clone @_data.select (i) -> fn(i)
 
   clear: -> @_data.length = 0
   all: -> clone(@_data)
@@ -112,8 +118,8 @@ class StoneSkin.MemoryDb extends StoneSkin.SyncedMemoryDb
       Promise.reject(e)
   remove: -> Promise.resolve super
   find: -> Promise.resolve super
-  findOne: -> Promise.resolve super
-  where: -> Promise.resolve super
+  first: -> Promise.resolve super
+  select: -> Promise.resolve super
   clear: -> Promise.resolve super
   all: -> Promise.resolve super
 
@@ -128,14 +134,16 @@ class StoneSkin.IndexedDb extends StoneSkin.Base
 
   clear: -> @_store.clear()
 
-  where: (fn) ->
+  select: (fn) ->
     result = []
     @_store.iterate (i) ->
       if fn(i) then result.push(i)
     .then -> result
 
   # TODO: skip when cursor finds first item
-  findOne: (fn) -> @where(fn).then (items) -> items[0]
+  first: (fn) -> @select(fn).then (items) => items[0]
+
+  last: (fn) -> @select(fn).then (items) => items[items.length - 1]
 
   # Internal
   _saveBatch: (list) ->

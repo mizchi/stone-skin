@@ -16,10 +16,10 @@ declare module StoneSkin {
 
   class Async<T> extends Base<T> {
     ready: Thenable<any>;
-
     find(id: Id): Thenable<T>;
-    where(fn: (t: T) => boolean): Thenable<T[]>;
-    findOne(fn: (t: T) => boolean): Thenable<T>;
+    select(fn: (t: T) => boolean): Thenable<T[]>;
+    first(fn: (t: T) => boolean): Thenable<T>;
+    last(fn: (t: T) => boolean): Thenable<T>;
     all(): Thenable<T[]>;
     clear(): Thenable<any>;
     save(t: T): Thenable<T>;
@@ -30,8 +30,9 @@ declare module StoneSkin {
 
   class Synced<T> extends Base<T> {
     find(id: Id): T;
-    where(fn: (t: T) => boolean): T[];
-    findOne(fn: (t: T) => boolean): T;
+    select(fn: (t: T) => boolean): T[];
+    first(fn: (t: T) => boolean): T;
+    last(fn: (t: T) => boolean): T;
     all(): T[];
     clear(): void;
     save(t: T): T;

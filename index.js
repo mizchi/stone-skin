@@ -31,11 +31,15 @@
       throw new Error('you should override');
     };
 
-    Base.prototype.findOne = function() {
+    Base.prototype.first = function() {
       throw new Error('you should override');
     };
 
-    Base.prototype.where = function() {
+    Base.prototype.last = function() {
+      throw new Error('you should override');
+    };
+
+    Base.prototype.select = function() {
       throw new Error('you should override');
     };
 
@@ -143,19 +147,19 @@
 
     SyncedMemoryDb.prototype.remove = function(id) {
       if (id instanceof Array) {
-        this._data = this._data.filter(function(i) {
+        this._data = this._data.select(function(i) {
           var ref;
           return ref = i._id, indexOf.call(id, ref) < 0;
         });
       } else {
-        this._data = this._data.filter(function(i) {
+        this._data = this._data.select(function(i) {
           return i._id !== id;
         });
       }
       return void 0;
     };
 
-    SyncedMemoryDb.prototype.findOne = function(fn) {
+    SyncedMemoryDb.prototype.first = function(fn) {
       var item, j, len, ref;
       ref = this._data;
       for (j = 0, len = ref.length; j < len; j++) {
@@ -167,7 +171,19 @@
       return void 0;
     };
 
-    SyncedMemoryDb.prototype.where = function(fn) {
+    SyncedMemoryDb.prototype.last = function(fn) {
+      var item, j, len, ref;
+      ref = this._data.reverse();
+      for (j = 0, len = ref.length; j < len; j++) {
+        item = ref[j];
+        if (fn(item)) {
+          return item;
+        }
+      }
+      return void 0;
+    };
+
+    SyncedMemoryDb.prototype.select = function(fn) {
       var i, j, len, ref, result;
       result = [];
       ref = this._data;
@@ -177,7 +193,7 @@
           result.push(i);
         }
       }
-      return clone(this._data.filter(function(i) {
+      return clone(this._data.select(function(i) {
         return fn(i);
       }));
     };
@@ -220,12 +236,12 @@
       return Promise.resolve(MemoryDb.__super__.find.apply(this, arguments));
     };
 
-    MemoryDb.prototype.findOne = function() {
-      return Promise.resolve(MemoryDb.__super__.findOne.apply(this, arguments));
+    MemoryDb.prototype.first = function() {
+      return Promise.resolve(MemoryDb.__super__.first.apply(this, arguments));
     };
 
-    MemoryDb.prototype.where = function() {
-      return Promise.resolve(MemoryDb.__super__.where.apply(this, arguments));
+    MemoryDb.prototype.select = function() {
+      return Promise.resolve(MemoryDb.__super__.select.apply(this, arguments));
     };
 
     MemoryDb.prototype.clear = function() {
@@ -258,7 +274,7 @@
       return this._store.clear();
     };
 
-    IndexedDb.prototype.where = function(fn) {
+    IndexedDb.prototype.select = function(fn) {
       var result;
       result = [];
       return this._store.iterate(function(i) {
@@ -270,10 +286,20 @@
       });
     };
 
-    IndexedDb.prototype.findOne = function(fn) {
-      return this.where(fn).then(function(items) {
-        return items[0];
-      });
+    IndexedDb.prototype.first = function(fn) {
+      return this.select(fn).then((function(_this) {
+        return function(items) {
+          return items[0];
+        };
+      })(this));
+    };
+
+    IndexedDb.prototype.last = function(fn) {
+      return this.select(fn).then((function(_this) {
+        return function(items) {
+          return items[items.length - 1];
+        };
+      })(this));
     };
 
     IndexedDb.prototype._saveBatch = function(list) {
