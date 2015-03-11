@@ -127,8 +127,6 @@ describe 'StoneSkin', ->
     ]
     .then -> item.select (i) -> i.a >= 2
     .then (items) ->
-      debugger
-
       assert.ok items.length is 2
 
   it 'select by IndexedDb', ->

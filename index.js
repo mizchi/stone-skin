@@ -147,12 +147,12 @@
 
     SyncedMemoryDb.prototype.remove = function(id) {
       if (id instanceof Array) {
-        this._data = this._data.select(function(i) {
+        this._data = this._data.filter(function(i) {
           var ref;
           return ref = i._id, indexOf.call(id, ref) < 0;
         });
       } else {
-        this._data = this._data.select(function(i) {
+        this._data = this._data.filter(function(i) {
           return i._id !== id;
         });
       }
@@ -193,7 +193,7 @@
           result.push(i);
         }
       }
-      return clone(this._data.select(function(i) {
+      return clone(this._data.filter(function(i) {
         return fn(i);
       }));
     };
