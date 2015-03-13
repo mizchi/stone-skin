@@ -197,3 +197,61 @@ class StoneSkin.IndexedDb extends StoneSkin.Base
         schema: @schema
       memoryDb._data = items
       memoryDb
+
+class Migrator
+  # type version: string;
+
+  # version: version; // current version
+  constructor: (@version, @opts = {}) ->
+    @lastVersion = @getLastVersion()
+    @needInitialize = !@lastVersion
+
+  # version?
+  getLastVersion: ->
+    localStorage?.getItem('ss-dbVersion')
+
+  # boolean
+  needUpdated: ->
+    if @lastVersion? and @lastVersion is @version
+      false
+    else
+      true
+
+  # () => void
+  _setDbVersionToLocalStorage: ->
+    localStorage?.setItem 'ss-dbVersion', @version
+
+  # () => Promise<void>
+  migrate: ->
+    Promise.resolve(
+      if @needInitialize
+        @_setDbVersionToLocalStorage()
+        @opts.initialize?()
+      else
+        null
+    )
+    .then =>
+      if @needUpdated()
+        @_migrateByVersion @lastVersion, @version
+        .then =>
+          @_setDbVersionToLocalStorage()
+
+  # (from: version, to: version) => Promise<void>
+  _migrateByVersion: (from, to) =>
+    from = parseInt from, 10
+    to   = parseInt to, 10
+    start = Promise.resolve()
+    while from < to
+      fnName = "#{from}to#{from + 1}"
+      fn = @opts[fnName]
+      start = start.then fn
+      from++
+    start
+
+## utils
+StoneSkin.utils = {}
+
+# () => Promise<void>
+StoneSkin.utils.setupWithMigrate = (currentVersion, opts = {}) ->
+  migrator = new Migrator currentVersion, opts
+  migrator.setup()
