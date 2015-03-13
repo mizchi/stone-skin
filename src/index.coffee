@@ -254,4 +254,4 @@ StoneSkin.utils = {}
 # () => Promise<void>
 StoneSkin.utils.setupWithMigrate = (currentVersion, opts = {}) ->
   migrator = new Migrator currentVersion, opts
-  migrator.setup()
+  migrator.migrate()

@@ -476,7 +476,7 @@
       opts = {};
     }
     migrator = new Migrator(currentVersion, opts);
-    return migrator.setup();
+    return migrator.migrate();
   };
 
 }).call(this);
