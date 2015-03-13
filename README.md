@@ -63,6 +63,20 @@ item.ready
   console.log items
 ```
 
+## Migration helper
+
+```coffee
+StoneSkin.utils.setupWithMigrate '3',
+  initialize: ->
+    console.log 'init'        # at first
+  '1to2': ->
+    console.log 'exec 1 to 2' # call it if last setup version is 1
+  '2to3': ->
+    console.log 'exec 2 to 3' # call it if last setup version is 1 or 2
+```
+
+Need localStorage to save last version.
+
 ## TODO
 
 - DogFooding
