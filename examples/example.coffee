@@ -1,9 +1,12 @@
 global.StoneSkin = require '../src/with-tv4'
+global.Promise = require 'bluebird'
 
-window.addEventListener 'DOMContentLoaded', ->
-  document.body.innerHTML = 'Hello'
-  
-  class Item extends StoneSkin.IndexedDb
+# window.addEventListener 'DOMContentLoaded', ->
+#   document.body.innerHTML = 'Hello'
+
+do ->
+  # class Item extends StoneSkin.IndexedDb
+  class Item extends StoneSkin.MemoryDb
     storeName: 'Item'
     schema:
       properties:

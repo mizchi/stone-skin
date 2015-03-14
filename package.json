@@ -10,6 +10,8 @@
   "author": "mizchi",
   "license": "MIT",
   "devDependencies": {
+    "babel": "^4.7.12",
+    "bluebird": "^2.9.14",
     "chai": "^2.1.0",
     "coffee-script": "^1.9.1",
     "coffeeify": "^1.0.0",

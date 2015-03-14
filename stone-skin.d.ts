@@ -41,7 +41,11 @@ declare module StoneSkin {
     remove(ids: Id[]): void;
   }
 
-  export class IndexedDb<T> extends Async<T> {}
+  export class IndexedDb<T> extends Async<T> {
+    toMemoryDb(): MemoryDb<T>;
+    toSyncedMemoryDb(): SyncedMemoryDb<T>;
+  }
+
   export class MemoryDb<T> extends Async<T> {}
   export class SyncedMemoryDb<T> extends Synced<T> {}
 }
