@@ -1,31 +1,22 @@
 declare module StoneSkin {
   type Id = string;
-  export interface Thenable<R> {
-    then<U>(onFulfilled?: (value: R) => Thenable<U>, onRejected?: (error: any) => Thenable<U>): Thenable<U>;
-    then<U>(onFulfilled?: (value: R) => Thenable<U>, onRejected?: (error: any) => U): Thenable<U>;
-    then<U>(onFulfilled?: (value: R) => Thenable<U>, onRejected?: (error: any) => void): Thenable<U>;
-    then<U>(onFulfilled?: (value: R) => U, onRejected?: (error: any) => Thenable<U>): Thenable<U>;
-    then<U>(onFulfilled?: (value: R) => U, onRejected?: (error: any) => U): Thenable<U>;
-    then<U>(onFulfilled?: (value: R) => U, onRejected?: (error: any) => void): Thenable<U>;
-    catch(error: any): Thenable<any>;
-  }
 
   class Base<T> {
     validate(t: T): boolean;
   }
 
   class Async<T> extends Base<T> {
-    ready: Thenable<any>;
-    find(id: Id): Thenable<T>;
-    select(fn: (t: T) => boolean): Thenable<T[]>;
-    first(fn: (t: T) => boolean): Thenable<T>;
-    last(fn: (t: T) => boolean): Thenable<T>;
-    all(): Thenable<T[]>;
-    clear(): Thenable<any>;
-    save(t: T): Thenable<T>;
-    save(ts: T[]): Thenable<T[]>;
-    remove(id: Id): Thenable<any>;
-    remove(ids: Id[]): Thenable<any>;
+    ready: Promise<any>;
+    find(id: Id): Promise<T>;
+    select(fn: (t: T) => boolean): Promise<T[]>;
+    first(fn: (t: T) => boolean): Promise<T>;
+    last(fn: (t: T) => boolean): Promise<T>;
+    all(): Promise<T[]>;
+    clear(): Promise<any>;
+    save(t: T): Promise<T>;
+    save(ts: T[]): Promise<T[]>;
+    remove(id: Id): Promise<any>;
+    remove(ids: Id[]): Promise<any>;
   }
 
   class Synced<T> extends Base<T> {

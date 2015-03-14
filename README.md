@@ -117,17 +117,17 @@ See detail [stone-skin.d.ts](stone-skin.d.ts))
 
 `StoneSkin.IndexedDb` and `StoneSkin.MemoryDb` have same API
 
-- `ready: Thenable<any>`: return resolved promise if indexedDb ready.
-- `find(id: Id): Thenable<T>`: get first item by id
-- `select(fn: (t: T) => boolean): Thenable<T[]>`: filtered items by function
-- `first(fn: (t: T) => boolean): Thenable<T>`: get first item from filtered items
-- `last(fn: (t: T) => boolean): Thenable<T>`: get last item from filtered items
-- `all(): Thenable<T[]>`: return all items
-- `clear(): Thenable<void>`: remove all items
-- `save(t: T): Thenable<T>`: save item
-- `save(ts: T[]): Thenable<T[]>`: save items
-- `remove(id: Id): Thenable<void>`: remove item
-- `remove(ids: Id[]): Thenable<void>`: remove items
+- `ready: Promise<any>`: return resolved promise if indexedDb ready.
+- `find(id: Id): Promise<T>`: get first item by id
+- `select(fn: (t: T) => boolean): Promise<T[]>`: filtered items by function
+- `first(fn: (t: T) => boolean): Promise<T>`: get first item from filtered items
+- `last(fn: (t: T) => boolean): Promise<T>`: get last item from filtered items
+- `all(): Promise<T[]>`: return all items
+- `clear(): Promise<void>`: remove all items
+- `save(t: T): Promise<T>`: save item
+- `save(ts: T[]): Promise<T[]>`: save items
+- `remove(id: Id): Promise<void>`: remove item
+- `remove(ids: Id[]): Promise<void>`: remove items
 
 ## `StoneSkin.IndexedDb`
 
