@@ -1,3 +1,5 @@
 node_modules
 bundle.js
 test/test.js
+index.js
+with-tv4.js
