@@ -138,10 +138,19 @@ See detail [stone-skin.d.ts](stone-skin.d.ts))
 
 ## `StoneSkin.IndexedDb`
 
+- `storeName: string;` You need to set this value when you extend it.
 - `StoneSkin.IndexedDb<T>.prototype.toMemoryDb(): StoneSkin.MemoryDb`: return memory db by its items
 - `StoneSkin.IndexedDb<T>.prototype.toSyncedMemoryDb(): StoneSkin.SyncedMemoryDb`: return synced memory db by its items.
 
-## StoneSkin.SyncedMemoryDb
+## `StoneSkin.FileDb`
+
+- `filepath: string;` You need to set this value when you extend it.
+
+## `StoneSkin.LocalStorageDb`
+
+- `key: string;` You need to set this value when you extend it.
+
+## `StoneSkin.SyncedMemoryDb`
 
 It has almost same API without Promise wrap.
 
