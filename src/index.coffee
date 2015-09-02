@@ -2,6 +2,8 @@ Store = require 'idb-wrapper-promisify'
 uuid = require 'node-uuid'
 clone = require 'clone'
 
+r = if require? then require else null
+
 module.exports = StoneSkin = {}
 
 StoneSkin.validate = (data, schema)->
@@ -68,7 +70,9 @@ class StoneSkin.SyncedMemoryDb extends StoneSkin.Base
       unless valid
         reason = @createValidateReason(data)
         throw reason.error
+      # console.log("on save", data)
       return @_pushOrUpdate(data)
+      # console.log("on save", ret, data)
 
   # raw find
   _find: (id) ->
@@ -137,13 +141,13 @@ class StoneSkin.FileDb extends StoneSkin.CommitableDb
     unless @filepath?
       throw new Error "You have to set filepath in FileDb"
 
-    fs = global.require 'fs'
+    fs = r 'fs'
     if fs.existsSync @filepath
       @_data = JSON.parse fs.readFileSync(@filepath)
     else
       @_data = []
 
-  commit: =>
+  commit: (ret) =>
     new Promise (done) =>
       unless @filepath?
         throw new Error "_data is not serializable."
@@ -152,8 +156,8 @@ class StoneSkin.FileDb extends StoneSkin.CommitableDb
       catch e
         throw new Error ""
 
-      fs = global.require 'fs'
-      fs.writeFile(@filepath, jsonstr, done)
+      fs = r 'fs'
+      fs.writeFile(@filepath, jsonstr, -> done(ret))
 
 class StoneSkin.LocalStorageDb extends StoneSkin.CommitableDb
   key: null
@@ -169,7 +173,7 @@ class StoneSkin.LocalStorageDb extends StoneSkin.CommitableDb
     else
       @_data = []
 
-  commit: =>
+  commit: (ret) =>
     new Promise (done) =>
       unless @key?
         throw new Error "You have to set key in LocalStorageDb"
@@ -178,6 +182,8 @@ class StoneSkin.LocalStorageDb extends StoneSkin.CommitableDb
       catch e
         throw new Error "_data is not serializable."
       localStorage.setItem(@key, jsonstr)
+      done(ret)
+
 
 class StoneSkin.IndexedDb extends StoneSkin.Base
   keyPath: '_id'

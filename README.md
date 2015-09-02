@@ -11,10 +11,17 @@ Inspired by [mWater/minimongo](https://github.com/mWater/minimongo "mWater/minim
 ## Features
 
 - ActiveRecord like API
-- Isomorphic indexedDb or in-memory object
+- Universal indexedDb or in-memory object
 - Promisified
 - Runnable in shared-worker and service-worker
 - (optional) validation by jsonschema(tv4)
+- Selectable target
+  - IndexedDb(browser)
+  - LocalStorageDb(browser)
+  - FileDb(node)
+  - MemoryDb(universal)
+
+FileDb and LocalStorageDb do just only serialization to json/string. Don't use them with big data.
 
 ## Example
 
