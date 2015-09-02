@@ -123,6 +123,62 @@ class StoneSkin.MemoryDb extends StoneSkin.SyncedMemoryDb
   clear: -> Promise.resolve super
   all: -> Promise.resolve super
 
+class StoneSkin.CommitableDb extends StoneSkin.MemoryDb
+  commit: => throw 'Override me'
+  # will cause validation error
+  save: -> Promise.resolve(super).then @commit
+  remove: -> Promise.resolve super.then @commit
+  clear: -> Promise.resolve(super).then @commit
+
+class StoneSkin.FileDb extends StoneSkin.CommitableDb
+  filepath: null
+  constructor: ->
+    super
+    unless @filepath?
+      throw new Error "You have to set filepath in FileDb"
+
+    fs = global.require 'fs'
+    if fs.existsSync @filepath
+      @_data = JSON.parse fs.readFileSync(@filepath)
+    else
+      @_data = []
+
+  commit: =>
+    new Promise (done) =>
+      unless @filepath?
+        throw new Error "_data is not serializable."
+      try
+        jsonstr = JSON.stringify(@_data)
+      catch e
+        throw new Error ""
+
+      fs = global.require 'fs'
+      fs.writeFile(@filepath, jsonstr, done)
+
+class StoneSkin.LocalStorageDb extends StoneSkin.CommitableDb
+  key: null
+  constructor: ->
+    super
+    unless @key?
+      throw new Error "You have to set key in LocalStorageDb"
+    unless localStorage?
+      throw new Error "This envinronment can't touch localStorage"
+
+    if localStorage[@key]?
+      @_data = JSON.parse localStorage.getItem(@key)
+    else
+      @_data = []
+
+  commit: =>
+    new Promise (done) =>
+      unless @key?
+        throw new Error "You have to set key in LocalStorageDb"
+      try
+        jsonstr = JSON.stringify(@_data)
+      catch e
+        throw new Error "_data is not serializable."
+      localStorage.setItem(@key, jsonstr)
+
 class StoneSkin.IndexedDb extends StoneSkin.Base
   keyPath: '_id'
   constructor: ->
