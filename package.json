@@ -1,6 +1,6 @@
 {
   "name": "stone-skin",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Isomorphic IndexedDb and Memory data wrapper",
   "main": "index",
   "scripts": {
