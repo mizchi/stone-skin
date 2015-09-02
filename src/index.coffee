@@ -218,7 +218,9 @@ class StoneSkin.IndexedDb extends StoneSkin.Base
     @_store.putBatch(result).then -> result
 
   save: (data) ->
-    if data instanceof Array then return @_saveBatch(data)
+    if data instanceof Array
+      return Promise.resolve([]) if data.length is 0
+      return @_saveBatch(data)
 
     if @schema and !!@skipValidate is false
       # console.log data
@@ -232,6 +234,7 @@ class StoneSkin.IndexedDb extends StoneSkin.Base
 
   remove: (id) ->
     if id instanceof Array
+      return Promise.resolve() if id.length is 0
       @_store.removeBatch(id)
     else
       @_store.remove(id)
