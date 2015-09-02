@@ -17,9 +17,6 @@
     "coffeeify": "^1.0.0",
     "mocha": "^2.1.0"
   },
-  "typescript": {
-    "definition": "stone-skin.d.ts"
-  },
   "dependencies": {
     "clone": "^1.0.0",
     "idb-wrapper-promisify": "^2.1.1",

@@ -36,6 +36,14 @@ declare module StoneSkin {
     toMemoryDb(): MemoryDb<T>;
     toSyncedMemoryDb(): SyncedMemoryDb<T>;
   }
+  
+  export class LocalStorageDb<T> extends Async<T> {
+    key: string;
+  }
+
+  export class FileDb<T> extends Async<T> {
+    filename: string;
+  }
 
   export class MemoryDb<T> extends Async<T> {}
   export class SyncedMemoryDb<T> extends Synced<T> {}
