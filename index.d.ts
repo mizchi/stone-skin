@@ -10,7 +10,7 @@ declare module StoneSkin {
 
   class Async<T> extends Base<T> {
     ready: Promise<any>;
-    find(id: Id<T>): Promise<T>;
+    find(id: Id<Async<T>>): Promise<T>;
     select(fn: (t: T) => boolean): Promise<T[]>;
     first(fn: (t: T) => boolean): Promise<T>;
     last(fn: (t: T) => boolean): Promise<T>;
@@ -18,12 +18,12 @@ declare module StoneSkin {
     clear(): Promise<any>;
     save(t: T): Promise<T>;
     save(ts: T[]): Promise<T[]>;
-    remove(id: Id<T>): Promise<any>;
-    remove(ids: Id<T>[]): Promise<any>;
+    remove(id: Id<Async<T>>): Promise<any>;
+    remove(ids: Id<Async<T>>[]): Promise<any>;
   }
 
   class Synced<T> extends Base<T> {
-    find(id: Id<T>): T;
+    find(id: Id<Synced<T>>): T;
     select(fn: (t: T) => boolean): T[];
     first(fn: (t: T) => boolean): T;
     last(fn: (t: T) => boolean): T;
@@ -31,8 +31,8 @@ declare module StoneSkin {
     clear(): void;
     save(t: T): T;
     save(ts: T[]): T[];
-    remove(id: Id<T>): void;
-    remove(ids: Id<T>[]): void;
+    remove(id: Id<Synced<T>>): void;
+    remove(ids: Id<Synced<T>>[]): void;
   }
 
   export class IndexedDb<T> extends Async<T> {
