@@ -1,5 +1,8 @@
 declare module StoneSkin {
-  type Id = string;
+  // type Id<T> = any;
+  interface Id<T> {}
+  // declare
+  // Id:
 
   class Base<T> {
     validate(t: T): boolean;
@@ -7,7 +10,7 @@ declare module StoneSkin {
 
   class Async<T> extends Base<T> {
     ready: Promise<any>;
-    find(id: Id): Promise<T>;
+    find(id: Id<T>): Promise<T>;
     select(fn: (t: T) => boolean): Promise<T[]>;
     first(fn: (t: T) => boolean): Promise<T>;
     last(fn: (t: T) => boolean): Promise<T>;
@@ -15,12 +18,12 @@ declare module StoneSkin {
     clear(): Promise<any>;
     save(t: T): Promise<T>;
     save(ts: T[]): Promise<T[]>;
-    remove(id: Id): Promise<any>;
-    remove(ids: Id[]): Promise<any>;
+    remove(id: Id<T>): Promise<any>;
+    remove(ids: Id<T>[]): Promise<any>;
   }
 
   class Synced<T> extends Base<T> {
-    find(id: Id): T;
+    find(id: Id<T>): T;
     select(fn: (t: T) => boolean): T[];
     first(fn: (t: T) => boolean): T;
     last(fn: (t: T) => boolean): T;
@@ -28,15 +31,15 @@ declare module StoneSkin {
     clear(): void;
     save(t: T): T;
     save(ts: T[]): T[];
-    remove(id: Id): void;
-    remove(ids: Id[]): void;
+    remove(id: Id<T>): void;
+    remove(ids: Id<T>[]): void;
   }
 
   export class IndexedDb<T> extends Async<T> {
     toMemoryDb(): MemoryDb<T>;
     toSyncedMemoryDb(): SyncedMemoryDb<T>;
   }
-  
+
   export class LocalStorageDb<T> extends Async<T> {
     key: string;
   }
