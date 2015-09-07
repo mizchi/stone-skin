@@ -83,6 +83,13 @@ class StoneSkin.SyncedMemoryDb extends StoneSkin.Base
   # will wrap
   find: (id) -> @_find(id)
 
+  fetch: (id) ->
+    ret = @_find(id)
+    if ret?
+      return ret
+    else
+      throw new Error "#{id} entity does not exist"
+
   remove: (id) ->
     if id instanceof Array
       @_data = @_data.filter (i) -> i._id not in id
@@ -242,6 +249,11 @@ class StoneSkin.IndexedDb extends StoneSkin.Base
   find: (id) ->
     @_store.get(id)
     .catch (e) -> undefined
+
+  fetch: (id) ->
+    @_store.get(id).then (item) ->
+      return Promise.reject(new Error("#{id} entity does not exist")) unless item?
+      item
 
   all: -> @_store.getAll()
 

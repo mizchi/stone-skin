@@ -44,5 +44,13 @@ do ->
     item.remove 'xxx'
   .then ->
     item.all()
+
   .then (items) ->
     console.log items
+    console.log '---------'
+    item.fetch 'unknown key'
+    .then (i) ->
+      console.log 'should not come here', i
+
+  .catch (e) ->
+    console.log 'should come here'

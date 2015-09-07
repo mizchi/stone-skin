@@ -12,6 +12,7 @@ declare module StoneSkin {
   class Async<T> extends Base<T> {
     ready: Promise<any>;
     find(id: Id<Async<T>>): Promise<T & __WithId<T>>;
+    fetch(id: Id<Async<T>>): Promise<T & __WithId<T>>;
     select(fn: (t: T) => boolean): Promise<(T & __WithId<T>)[]>;
     first(fn: (t: T) => boolean): Promise<T & __WithId<T>>;
     last(fn: (t: T) => boolean): Promise<T & __WithId<T>>;
@@ -25,6 +26,7 @@ declare module StoneSkin {
 
   class Synced<T> extends Base<T> {
     find(id: Id<Synced<T>>): T & __WithId<T>;
+    fetch(id: Id<Synced<T>>): T & __WithId<T>;
     select(fn: (t: T) => boolean): T & __WithId<T>[];
     first(fn: (t: T) => boolean): T & __WithId<T>;
     last(fn: (t: T) => boolean): T & __WithId<T>;
