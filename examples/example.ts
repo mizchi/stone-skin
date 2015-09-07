@@ -7,7 +7,6 @@ declare var global: any;
 global.StoneSkin = require('../with-tv4');
 
 interface FooSchema {
-  _id?: Id<FooSchema>;
   name: string;
 }
 
@@ -15,7 +14,6 @@ class FooStore extends StoneSkin.MemoryDb<FooSchema> {
 }
 
 class BarStore extends StoneSkin.MemoryDb<{
-  _id?: Id<BarStore>;
   fooId: Id<FooStore>;
   name: string;
 }> {
@@ -26,11 +24,10 @@ const bar = new BarStore();
 foo.save({name: "foo"})
 .then(i => {
   console.log(i);
-  return foo.find(<Id<FooStore>>(i._id));
+  return foo.find(i._id);
 })
 .then(foo => {
   return bar.save({
-    // fooId: foo._id,
     fooId: foo._id,
     name: 'it\'s bar'
   })

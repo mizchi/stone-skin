@@ -1,36 +1,37 @@
 declare module StoneSkin {
-  // type Id<T> = any;
   interface Id<T> {}
-  // declare
-  // Id:
 
   class Base<T> {
     validate(t: T): boolean;
   }
 
+  interface __WithId<T> {
+    _id: Id<T>;
+  }
+
   class Async<T> extends Base<T> {
     ready: Promise<any>;
-    find(id: Id<Async<T>>): Promise<T>;
-    select(fn: (t: T) => boolean): Promise<T[]>;
-    first(fn: (t: T) => boolean): Promise<T>;
-    last(fn: (t: T) => boolean): Promise<T>;
-    all(): Promise<T[]>;
+    find(id: Id<Async<T>>): Promise<T & __WithId<T>>;
+    select(fn: (t: T) => boolean): Promise<(T & __WithId<T>)[]>;
+    first(fn: (t: T) => boolean): Promise<T & __WithId<T>>;
+    last(fn: (t: T) => boolean): Promise<T & __WithId<T>>;
+    all(): Promise<(T & __WithId<T>)[]>;
     clear(): Promise<any>;
-    save(t: T): Promise<T>;
-    save(ts: T[]): Promise<T[]>;
+    save(t: T): Promise<T & __WithId<T>>;
+    save(ts: T[]): Promise<(T & __WithId<T>)[]>;
     remove(id: Id<Async<T>>): Promise<any>;
     remove(ids: Id<Async<T>>[]): Promise<any>;
   }
 
   class Synced<T> extends Base<T> {
-    find(id: Id<Synced<T>>): T;
-    select(fn: (t: T) => boolean): T[];
-    first(fn: (t: T) => boolean): T;
-    last(fn: (t: T) => boolean): T;
-    all(): T[];
+    find(id: Id<Synced<T>>): T & __WithId<T>;
+    select(fn: (t: T) => boolean): T & __WithId<T>[];
+    first(fn: (t: T) => boolean): T & __WithId<T>;
+    last(fn: (t: T) => boolean): T & __WithId<T>;
+    all(): (T & __WithId<T>)[];
     clear(): void;
-    save(t: T): T;
-    save(ts: T[]): T[];
+    save(t: T): T & __WithId<T>;
+    save(ts: T[]): (T & __WithId<T>)[];
     remove(id: Id<Synced<T>>): void;
     remove(ids: Id<Synced<T>>[]): void;
   }
