@@ -11,7 +11,8 @@ declare module StoneSkin {
 
   class Async<T> extends Base<T> {
     ready: Promise<any>;
-    find(id: Id<Async<T>>): Promise<T & __WithId<T>>;
+    find(id: Id<Async<T>>)   : Promise<(T & __WithId<T>)>;
+    find(ids: Id<Async<T>>[]): Promise<(T & __WithId<T>)[]>;
     fetch(id: Id<Async<T>>): Promise<T & __WithId<T>>;
     select(fn: (t: T) => boolean): Promise<(T & __WithId<T>)[]>;
     first(fn: (t: T) => boolean): Promise<T & __WithId<T>>;
@@ -24,8 +25,16 @@ declare module StoneSkin {
     remove(ids: Id<Async<T>>[]): Promise<any>;
   }
 
+  class ImmutableLoader<T> extends Base<T> {
+    find(id: Id<T>): T & __WithId<T>;
+    fetch(id: Id<T>): T & __WithId<T>;
+    select(fn: (t: T) => boolean): T & __WithId<T>[];
+    all(): (T & __WithId<T>)[];
+  }
+
   class Synced<T> extends Base<T> {
     find(id: Id<Synced<T>>): T & __WithId<T>;
+    find(ids: Id<Synced<T>>[]): (T & __WithId<T>)[];
     fetch(id: Id<Synced<T>>): T & __WithId<T>;
     select(fn: (t: T) => boolean): T & __WithId<T>[];
     first(fn: (t: T) => boolean): T & __WithId<T>;

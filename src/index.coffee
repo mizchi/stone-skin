@@ -116,6 +116,11 @@ class StoneSkin.SyncedMemoryDb extends StoneSkin.Base
   clear: -> @_data.length = 0
   all: -> clone(@_data)
 
+class StoneSkin.ImmutableLoader extends StoneSkin.SyncedMemoryDb
+  constructor: ->
+    super
+    @save(@initialize())
+
 class StoneSkin.MemoryDb extends StoneSkin.SyncedMemoryDb
   constructor: ->
     super
